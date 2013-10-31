@@ -1,6 +1,5 @@
 ﻿#region Using Statements
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -13,14 +12,16 @@ namespace DesktopBattle
     /// <summary>
     /// The main class that draws individual objects to the screen.
     /// </summary>
-    class Sprite 
+    public class Sprite 
     {
         #region Class Variables
         public Vector2 Position = new Vector2(0, 0); //current position
         protected Vector2 spriteDirection = Vector2.Zero; //initial direction of the enemy
         protected Vector2 spriteSpeed = Vector2.Zero; //initial speed of the enemy
         protected float spriteAngle; //rotation of the sprite
-        protected Texture2D mSpriteTexture; //the texture being used
+        public Texture2D mSpriteTexture; //the texture being used
+        public string spriteName; //name of the sprite
+        static protected Random rnd = new Random();
         public Rectangle Size //the size of the sprite
         {
             get
@@ -34,10 +35,13 @@ namespace DesktopBattle
         }
         public int HP { get { return hp; } //hit points
             set //caps the hit points from 0 to 100
-            { 
-                MathHelper.Clamp(hp, 0, 100);
-                hp = value;
-                if (hp == 0) isAlive = false;
+            {
+                if (isAlive)
+                {
+                    MathHelper.Clamp(hp, 0, 100);
+                    hp = value;
+                    if (hp <= 0) isAlive = false;
+                }
             }
         }
         private int hp; //the private hp variable
@@ -57,23 +61,33 @@ namespace DesktopBattle
         /// <summary>
         /// Used to bring a new sprite into existence at either startup or during play
         /// </summary>
-        public void LoadContent(ContentManager theContentManager, string assetName, GraphicsDeviceManager graphics) 
+        public void LoadContent(string assetName) 
         {
-            mSpriteTexture = theContentManager.Load<Texture2D>(assetName); //stores the texture
+            mSpriteTexture = Game1.theContentManager.Load<Texture2D>(assetName); //stores the texture
+            spriteName = assetName;
 
             //generates the "safe" area of the screen for the sprite
-            maxX = graphics.GraphicsDevice.Viewport.Width - Size.Width;
-            maxY = graphics.GraphicsDevice.Viewport.Height - Size.Height;
+            maxX = Game1.graphics.GraphicsDevice.Viewport.Width - Size.Width;
+            maxY = Game1.graphics.GraphicsDevice.Viewport.Height - Size.Height;
+        }
+
+        /// <summary>
+        /// Makes a "randomized" starting location for the sprite.
+        /// </summary>
+        protected void GenerateStartingLocation()
+        {
+            Position.X = maxX - 30;
+            Position.Y = maxY - 100 - rnd.Next(500);
         }
 
         /// <summary>
         /// Draw the sprite onto the screen
         /// </summary>
-        public virtual void Draw(SpriteBatch theSpriteBatch) 
+        public virtual void Draw() 
         {
             if (isAlive) 
             {
-                theSpriteBatch.Draw(mSpriteTexture, Position, new Rectangle(0, 0, mSpriteTexture.Width, mSpriteTexture.Height),
+                Game1.spriteBatch.Draw(mSpriteTexture, Position, new Rectangle(0, 0, mSpriteTexture.Width, mSpriteTexture.Height),
                     Color.White, spriteAngle, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
             }
         }
@@ -84,9 +98,9 @@ namespace DesktopBattle
         public virtual void Update(GameTime gameTime) { }
 
         /// <summary>
-        /// Passes down the double argument LoadContent() to child classes.
+        /// Passes down the no argument LoadContent() to child classes.
         /// </summary>
-        public virtual void LoadContent(ContentManager theContentManager, GraphicsDeviceManager graphics) { }
+        public virtual void LoadContent() { }
 
         /// <summary>
         /// Handles movement around the screen, doesn't allow the sprite to go off-screen
@@ -123,7 +137,7 @@ namespace DesktopBattle
 
         public override string ToString()
         {
-            return "Sprite Name: " + mSpriteTexture.Name;
+            return "Sprite Name: " + spriteName;
         }
     }
 }

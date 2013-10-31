@@ -14,45 +14,30 @@ namespace DesktopBattle
     /// <summary>
     /// Holds the abstract methods for every Gun in the game.
     /// </summary>
-    abstract class Gun : Weapon
+    [Serializable()]
+    public abstract class Gun : Weapon
     {
-        #region Class Variables
-        public string theWeaponName; //the name of the weapon file
-        protected static GraphicsDeviceManager graphicsManager;
-        protected static ContentManager mContentManager;
-        public Rectangle Size; //the size of the weapon, set at creation of weapon
-        public Vector2 Position; //current position of the gun
-        protected float gunAngle; //angle of the gun to the mouse
-        public int DamagePerBullet; //how much damage the bullet does
-        protected List<Bullet> listBullets;
-        public List<Bullet> lBullets //list of bullets fired from the gun
-        {
-            get { return listBullets; }
-            set { listBullets = value; }
-        }
-        private Texture2D mGunTexture; //the texture being used
-        #endregion
-
         /// <summary>
         /// All guns must have their own method to fire bullets.
         /// </summary>
-        public abstract void Shoot();
+        public override void Shoot() { }
 
         /// <summary>
         /// Runs once every frame.
         /// </summary>
-        public virtual void Update(GameTime gameTime, Vector2 heroPosition)
+        public override void Update(GameTime gameTime, Vector2 heroPosition)
         {
             Position.X = heroPosition.X + 30;
             Position.Y = heroPosition.Y + 45;
 
             //updates and removes bullets if necessary
-            for (int i = lBullets.Count() - 1; i >= 0; i--)
+            for (int i = Hero.lBullets.Count() - 1; i >= 0; i--)
             {
-                lBullets[i].Update(gameTime);
-                if (!lBullets[i].isAlive)
+                Hero.lBullets[i].Update(gameTime);
+                if (!Hero.lBullets[i].isAlive)
                 {
-                    lBullets.Remove(lBullets[i]);
+                    Hero.sBullets.push(Hero.lBullets[i]);
+                    Hero.lBullets.Remove(Hero.lBullets[i]);
                 }
             }
 
@@ -60,19 +45,19 @@ namespace DesktopBattle
             MouseState curMouse = Mouse.GetState();
             Vector2 mouseLoc = new Vector2(curMouse.X, curMouse.Y);
             Vector2 direction = -(heroPosition - mouseLoc);
-            gunAngle = (float)(Math.Atan2(direction.Y, direction.X)); 
+            weaponAngle = (float)(Math.Atan2(direction.Y, direction.X)); 
         }
 
         /// <summary>
         /// Runs once every frame to draw the Gun onto the screen.
         /// </summary>
-        public virtual void Draw(SpriteBatch spriteBatch)
+        public override void Draw()
         {
-            spriteBatch.Draw(mGunTexture, Position, null, Color.White, gunAngle,
-            new Vector2(5, 20), 1.0f, SpriteEffects.None, 0f);
-            foreach (var Bullet in lBullets)
+            Game1.spriteBatch.Draw(mWeaponTexture, Position, null, Color.White, weaponAngle,
+            new Vector2(5, 20), 1.0f, base.SpriteEffect, 0f);
+            foreach (var Bullet in Hero.lBullets)
             {
-                Bullet.Draw(spriteBatch);
+                Bullet.Draw();
             }
         }
 
@@ -80,14 +65,13 @@ namespace DesktopBattle
         /// Creates a new Gun object given a gun name.
         /// </summary>
         /// <param name="assetName">The name of the gun in the file structure</param>
-        public void LoadContent(string assetName)
+        public override void LoadContent(string assetName)
         {
-            lBullets = new List<Bullet>();
-            mGunTexture = mContentManager.Load<Texture2D>(assetName); //stores the texture
-            theWeaponName = mGunTexture.Name; //stores the texture name
+            base.mWeaponTexture = Game1.theContentManager.Load<Texture2D>(assetName); //stores the texture
+            theWeaponName = assetName; //stores the texture name
 
             //creates a rectangular bounding box around the gun
-            Size = new Rectangle(0, 0, (int)(mGunTexture.Width), (int)(mGunTexture.Height));
+            Size = new Rectangle(0, 0, (int)(mWeaponTexture.Width), (int)(mWeaponTexture.Height));
         }
 
         public override string ToString()

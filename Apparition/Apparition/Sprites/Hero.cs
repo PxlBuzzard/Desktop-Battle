@@ -15,7 +15,8 @@ namespace DesktopBattle
     /// <summary>
     /// Creates the main Hero that the player controls.
     /// </summary>
-    sealed partial class Hero : Sprite
+    [Serializable()]
+    public class Hero : Sprite
     {
         #region Class Variables
         private string heroAssetName = "pictures/maincharacter"; //name of the hero texture
@@ -26,29 +27,58 @@ namespace DesktopBattle
         private int moveDown = 3; //the speed at which they move down
         private int moveLeft = -3; //the speed at which they move left
         private int moveRight = 3; //the speed at which they move right
-
-        KeyboardState oldState; //last known keyboard state
-        MouseState oldMouse; //last known mouse state
+        private KeyboardState oldState; //last known keyboard state
+        private MouseState oldMouse; //last known mouse state
         public Weapon[] weapons = new Weapon[2]; //array of weapons held by the Hero
         public int currentWeapon; //the current weapon the Hero is wielding
+        public int nextWeapon { get //goes to the next available weapon in the array
+        {
+            if (currentWeapon + 1 >= weapons.Count() || weapons[currentWeapon+1] == null)
+            { currentWeapon = 0; }
+            else { currentWeapon++; }
+            return currentWeapon; } 
+        }
+        public bool isFlipped; //flips the Hero sprite
+        private SpriteEffects SpriteEffect
+        {
+            get
+            {
+                if (isFlipped) return SpriteEffects.FlipHorizontally;
+                else return SpriteEffects.None;
+            }
+        }
+
+        private static List<Bullet> listBullets = new List<Bullet>();
+        public static List<Bullet> lBullets //list of all the onscreen bullets
+        {
+            get { return listBullets; }
+            set { listBullets = value; }
+        }
+        private static Stack<Bullet> stackBullets;
+        public static Stack<Bullet> sBullets //stack of all the offscreen bullets
+        {
+            get { return stackBullets; }
+            set { stackBullets = value; }
+        }
         #endregion
 
         /// <summary>
         /// Runs once to create the main hero.
         /// </summary>
-        public override void LoadContent(ContentManager theContentManager, GraphicsDeviceManager graphics) 
+        public override void LoadContent() 
         {
             Position = new Vector2(startPositionX, startPositionY);
-            spriteAngle = 0.0f;
+            spriteAngle = 0.0f; //starting angle of the Hero
             HP = 100;
             sCurrentState = State.Moving;
             newlyCreated = false;
 
             //this part will need to handle file I/O in the future
-            weapons[0] = new Pistol(theContentManager, graphics);
+            weapons[0] = new Pistol();
             currentWeapon = 0;
+            sBullets = Weapon.GenerateBulletStack(50);
 
-            base.LoadContent(theContentManager, heroAssetName, graphics);
+            base.LoadContent(heroAssetName);
         }
 
         /// <summary>
@@ -65,21 +95,11 @@ namespace DesktopBattle
             UpdateMovement(aCurrentKeyboardState);
 
             //this is the hackiest way to handle weapon switching right now, sorry
-            Gun gunCheck = weapons[currentWeapon] as Gun;
-            if (gunCheck != null)
+            if (aCurrentKeyboardState.IsKeyDown(Keys.Q) &&
+                oldState.IsKeyUp(Keys.Q))
             {
-                if (aCurrentKeyboardState.IsKeyDown(Keys.Q) &&
-                    oldState.IsKeyUp(Keys.Q) && currentWeapon == 1)
-                {
-                    currentWeapon = 0;
-                }
-                else if (aCurrentKeyboardState.IsKeyDown(Keys.Q) &&
-                    oldState.IsKeyUp(Keys.Q) && currentWeapon == 0)
-                {
-                    currentWeapon = 1;
-                }
+                currentWeapon = nextWeapon;
             }
-
             oldState = aCurrentKeyboardState;
 
             //handle mouse input
@@ -90,20 +110,63 @@ namespace DesktopBattle
             {
                 weapons[currentWeapon].Shoot();
             }
+            //flips the Hero horizontally depending on the mouse position
+            if (Position.X >= aCurrentMouseState.X)
+            {
+                isFlipped = true;
+            }
+            else
+            {
+                isFlipped = false;
+            }
             oldMouse = aCurrentMouseState;
 
             base.Update(theGameTime, spriteSpeed, spriteDirection); //must be final line
         }
 
         /// <summary>
-        /// Draw the Hero and his gun onto the screen.
+        /// Draw the Hero and his weapon onto the screen.
         /// </summary>
-        public override void Draw(SpriteBatch theSpriteBatch)
+        public override void Draw()
         {
             if (isAlive)
             {
-                theSpriteBatch.Draw(base.mSpriteTexture, base.Position, new Rectangle(0, 0, base.mSpriteTexture.Width, base.mSpriteTexture.Height), Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
-                weapons[currentWeapon].Draw(theSpriteBatch);
+                Game1.spriteBatch.Draw(base.mSpriteTexture, base.Position, new Rectangle(0, 0, base.mSpriteTexture.Width, base.mSpriteTexture.Height), Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffect, 0);
+                weapons[currentWeapon].Draw();
+            }
+        }
+
+        /// <summary>
+        /// Handles all movement for the hero.
+        /// </summary>
+        private void UpdateMovement(KeyboardState aCurrentKeyboardState)
+        {
+            if ((sCurrentState == State.Moving || sCurrentState == State.Idling) && isAlive)
+            {
+                spriteSpeed = Vector2.Zero;
+                spriteDirection = Vector2.Zero;
+
+                if (aCurrentKeyboardState.IsKeyDown(Keys.Left) || aCurrentKeyboardState.IsKeyDown(Keys.A))
+                {
+                    spriteSpeed.X = heroSpeed;
+                    spriteDirection.X = moveLeft;
+                }
+                else if (aCurrentKeyboardState.IsKeyDown(Keys.Right) || aCurrentKeyboardState.IsKeyDown(Keys.D))
+                {
+                    spriteSpeed.X = heroSpeed;
+                    spriteDirection.X = moveRight;
+                }
+
+                if (aCurrentKeyboardState.IsKeyDown(Keys.Up) || aCurrentKeyboardState.IsKeyDown(Keys.W))
+                {
+                    spriteSpeed.Y = heroSpeed;
+                    spriteDirection.Y = moveUp;
+                }
+                else if (aCurrentKeyboardState.IsKeyDown(Keys.Down) || aCurrentKeyboardState.IsKeyDown(Keys.S))
+                {
+                    spriteSpeed.Y = heroSpeed;
+                    spriteDirection.Y = moveDown;
+                }
             }
         }
     }

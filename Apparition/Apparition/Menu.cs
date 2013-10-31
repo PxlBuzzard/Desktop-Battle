@@ -1,6 +1,6 @@
 ﻿#region Using Statements
 using System;
-using System.Collections.Generic;
+
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -13,16 +13,19 @@ namespace DesktopBattle
 {
     public abstract class Menu
     {
-        //enum of menu state
-        public enum MenuState
+
+        public bool isVisible = false;
+        public enum GameState
         {
             MainMenu,
             PauseMenu,
             HelpMenu,
             GameOver,
-            WinMenu
+            WinMenu,
+            Playing,
+            LevelSelect
         }
-        public MenuState sCurrentState; //stores the current state
+        //public static MenuState currentMenuState { get; set; } //stores the current state
 
         /// <summary>
         /// Runs once a frame to draw the menu on the screen.
@@ -30,7 +33,7 @@ namespace DesktopBattle
 
         public void Update(GameTime gameTime) { }
 
-        public void Draw(SpriteBatch theSpriteBatch) { }
+        public void Draw() { }
 
 
     }

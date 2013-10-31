@@ -15,7 +15,7 @@ namespace DesktopBattle
     /// <summary>
     /// Clippy is a basic enemy with random movement and low hp.
     /// </summary>
-    class Clippy : Sprite 
+    public class Clippy : Sprite 
     {
         #region Class Variables
         private string enemyAssetName = "pictures/Clippy"; //name of the hero texture
@@ -24,33 +24,17 @@ namespace DesktopBattle
         private int moveDown = 1; //the speed at which they move down
         private int moveLeft = -1; //the speed at which they move left
         private int moveRight = 1; //the speed at which they move right
-        Random rnd = new Random();
-        int startPositionX; //spawn position X, assigned at creation
-        int startPositionY; //spawn position Y, assigned at creation
         #endregion
 
         /// <summary>
         /// Runs once to generate a new Clippy.
         /// </summary>
-        public override void LoadContent(ContentManager theContentManager, GraphicsDeviceManager graphics) 
+        public Clippy() 
         {
-            GenerateStartingLocation();
-            Position = new Vector2(startPositionX, startPositionY);
             sCurrentState = State.Moving;
-            HP = 20;
             spriteAngle = 0.0f;
-            newlyCreated = false;
 
-            base.LoadContent(theContentManager, enemyAssetName, graphics);
-        }
-
-        /// <summary>
-        /// Makes a "randomized" starting location for Clippy.
-        /// </summary>
-        private void GenerateStartingLocation() 
-        {
-            startPositionX = 900 + rnd.Next(maxX);
-            startPositionY = 300 + rnd.Next(maxY);
+            base.LoadContent(enemyAssetName);
         }
 
         /// <summary>
@@ -59,7 +43,15 @@ namespace DesktopBattle
         /// </summary>
         public override void Update(GameTime theGameTime) 
         {
-            int moveCheck = rnd.Next(100);
+            if (newlyCreated)
+            {
+                GenerateStartingLocation();
+                HP = 20;
+                isAlive = true;
+                newlyCreated = false;
+            }
+
+            int moveCheck = Sprite.rnd.Next(100);
             if (moveCheck > 95) 
             {
                 UpdateMovement();
@@ -76,24 +68,24 @@ namespace DesktopBattle
             {
                 spriteSpeed = Vector2.Zero;
                 spriteDirection = Vector2.Zero;
-                int randomMovement = rnd.Next(4);
+                int randomMovement = rnd.Next(8);
 
-                if (randomMovement == 0) 
+                if (randomMovement <= 4) 
                 {
                     spriteSpeed.X = enemySpeed;
                     spriteDirection.X = moveLeft;
                 }
-                else if (randomMovement == 1) 
+                else if (randomMovement == 5) 
                 {
                     spriteSpeed.X = enemySpeed;
                     spriteDirection.X = moveRight;
                 }
-                else if (randomMovement == 2) 
+                else if (randomMovement == 6) 
                 {
                     spriteSpeed.Y = enemySpeed;
                     spriteDirection.Y = moveUp;
                 }
-                else if (randomMovement == 3) 
+                else if (randomMovement == 7) 
                 {
                     spriteSpeed.Y = enemySpeed;
                     spriteDirection.Y = moveDown;

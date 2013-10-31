@@ -1,6 +1,6 @@
 ﻿#region Using Statements
 using System;
-using System.Collections.Generic;
+
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -13,11 +13,11 @@ namespace DesktopBattle
     /// <summary>
     /// Makes a room that will be one of many inside a level.
     /// </summary>
-    class Room : Area
+    public class Room : Area
     {
         #region Class Variables
         public Texture2D roomBackground; //the background texture
-        public int initialEnemyCount; //number of enemies that will be in the room on first load.
+        public int totalEnemies; //number of enemies that will be in the room on first load.
         #endregion
 
         /// <summary>
@@ -25,10 +25,10 @@ namespace DesktopBattle
         /// </summary>
         /// <param name="roomTexture">The string of the background texture of the room</param>
         /// <param name="numEnemies">number of initial enemies to spawn in the room</param>
-        public Room(ContentManager theContentManager, string roomTexture, int numEnemies)
+        public Room(string roomTexture, int numEnemies)
         {
-            roomBackground = theContentManager.Load<Texture2D>(roomTexture);
-            initialEnemyCount = numEnemies;
+            roomBackground = Game1.theContentManager.Load<Texture2D>(roomTexture);
+            totalEnemies = numEnemies;
         }
 
         /// <summary>

@@ -14,17 +14,16 @@ namespace DesktopBattle
     /// <summary>
     /// Makes a pistol weapon.
     /// </summary>
-    class Pistol : Gun
+    [Serializable()]
+    public class Pistol : Gun
     {
         /// <summary>
         /// Creates a pistol with basic parameters.
         /// </summary>
-        public Pistol(ContentManager theContentManager, GraphicsDeviceManager graphics)
+        public Pistol()
         {
-            mContentManager = theContentManager;
             base.LoadContent("pictures/pistol");
-            base.DamagePerBullet = 10;
-            graphicsManager = graphics;
+            base.DamagePerAttack = 10;
         }
 
         /// <summary>
@@ -32,7 +31,10 @@ namespace DesktopBattle
         /// </summary>
         public override void Shoot()
         {
-            lBullets.Add(new Bullet(mContentManager, graphicsManager, gunAngle, Position));
+            Bullet b = Hero.sBullets.peek();
+            Hero.sBullets.Pop();
+            b.LoadContent(base.weaponAngle, base.Position, DamagePerAttack);
+            Hero.lBullets.Add(b);
         }
     }
 }

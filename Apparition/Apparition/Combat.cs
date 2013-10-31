@@ -1,6 +1,5 @@
 ﻿#region Using Statements
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -14,67 +13,92 @@ namespace DesktopBattle
     /// <summary>
     /// Handles all combat-related events ingame, such as damage checks.
     /// </summary>
-    class Combat 
+    public class Combat 
     {
         #region Class Variables
-        Random rnd = new Random();
-        Hero mHero;
-        List<Sprite> lEnemies;
+        static Random rnd = new Random();
+        private int timeToSpawn;
+        private int nextSpawn = 0;
+        public bool stopSpawn = false;
         #endregion
 
         /// <summary>
-        /// Runs at startup to get information passed into Combat.
+        /// Creates a queue of enemies that the game can cycle through.
         /// </summary>
-        /// <param name="theHero">the hero class</param>
-        /// <param name="enemies">the list of enemies</param>
-        public void LoadContent(Hero theHero, List<Sprite> enemies) 
+        /// <param name="numEnemies"></param>
+        public void CreateEnemyQueue(int numEnemies)
         {
-            mHero = theHero;
-            lEnemies = enemies;
-        }
-
-        /// <summary>
-        /// Fills the list of enemies with new enemies.
-        /// </summary>
-        /// <param name="numEnemies">number of enemies to add</param>
-        public void CreateEnemies(int numEnemies) 
-        {
-            for (int i = 1; i <= numEnemies; i++) 
+            for (int i = 0; i < (int)(numEnemies / 4); i++)
             {
-                lEnemies.Add(new Clippy());
+                Game1.qEnemies.enqueue(new Key());
+                for (int j = 0; j <= 3; j++)
+                {
+                    Game1.qEnemies.enqueue(new Clippy());
+                }
+            }
+            //failsafe to fill up to actual number of desired enemies
+            while (Game1.qEnemies.size() < numEnemies)
+            {
+                Game1.qEnemies.enqueue(new Clippy());
             }
         }
 
         /// <summary>
-        /// Runs on every frame to handle collision detection.
+        /// Runs on every frame to handle collision detection and enemy spawning.
         /// </summary>
         public void Update(GameTime gameTime) 
         {
-            // Check collision with player, if hit then lower HP and move away
-            foreach (Sprite Enemy in lEnemies)
+            //Spawns new enemies into the room
+            if (Game1.cArea.Rooms[Game1.cArea.currentRoom].totalEnemies - Game1.cArea.enemiesSpawnedInRoom > 0
+                && Game1.qEnemies.size() > 0 && !stopSpawn && timeToSpawn >= nextSpawn)
             {
-                foreach (Bullet Bullet in mHero.weapons[mHero.currentWeapon].lBullets)
+                Game1.lEnemies.Add(Game1.qEnemies.dequeue());
+                Game1.cArea.enemiesSpawnedInRoom++;
+                //if it's been more than 1.2 secs then spawn 2 enemies
+                if (Game1.cArea.Rooms[Game1.cArea.currentRoom].totalEnemies - Game1.cArea.enemiesSpawnedInRoom > 0
+                    && nextSpawn >= 1200)
                 {
+                    Game1.lEnemies.Add(Game1.qEnemies.dequeue());
+                    Game1.cArea.enemiesSpawnedInRoom++;
+                }
+                timeToSpawn = nextSpawn;
+                nextSpawn += 500 + rnd.Next(2300);
+            }
+            else
+            {
+                timeToSpawn += gameTime.ElapsedGameTime.Milliseconds;
+            }
+            //begin collision detection
+            foreach (Sprite Enemy in Game1.lEnemies)
+            {
+                foreach (Bullet Bullet in Hero.lBullets)
+                {
+                    //bullet collides with enemy
                     if ((Bullet.Size).Intersects(Enemy.Size))
                     {
-                        Enemy.HP -= 10; //CHANGE THIS AFTER MILESTONE 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        //Console.Beep();
+                        Enemy.HP -= Bullet.bulletDamage;
                         Bullet.isAlive = false;
                     }
                 }
-                if ((mHero.Size).Intersects(Enemy.Size))
+                // Check collision with player, if hit then lower HP and move away
+                if ((Game1.cHero.Size).Intersects(Enemy.Size))
                 {
-                    mHero.HP -= 10;
-                    mHero.Position.X -= 50;
+                    Game1.cHero.HP -= 10;
+                    Game1.cHero.Position.X -= 50; //this is bad knockback code
                 }
             }
 
-            //updates and removes bullets if necessary
-            for (int i = lEnemies.Count() - 1; i >= 0; i--)
+            //removes enemies if necessary
+            for (int i = Game1.lEnemies.Count() - 1; i >= 0; i--)
             {
-                lEnemies[i].Update(gameTime);
-                if (!lEnemies[i].isAlive)
+                if (!Game1.lEnemies[i].isAlive)
                 {
-                    lEnemies.Remove(lEnemies[i]);
+                    Game1.lEnemies[i].newlyCreated = true;
+                    Game1.lEnemies[i].isAlive = true;
+                    Game1.qEnemies.enqueue(Game1.lEnemies[i]);
+                    Game1.lEnemies.Remove(Game1.lEnemies[i]);
+                    Game1.cArea.killsInRoom++;
                 }
             }
         }

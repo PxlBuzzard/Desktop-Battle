@@ -75,7 +75,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
@@ -127,8 +127,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Area.cs" />
-    <Compile Include="Sprites\Hero_Move.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="DataStructs\List.cs" />
+    <Compile Include="DataStructs\Node.cs" />
+    <Compile Include="DataStructs\OverflowException.cs" />
+    <Compile Include="DataStructs\Queue.cs" />
+    <Compile Include="Sprites\Key.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Menus\GameOver.cs" />
     <Compile Include="Menus\HelpMenu.cs" />
@@ -136,6 +140,8 @@
     <Compile Include="Menus\PauseMenu.cs" />
     <Compile Include="Menus\WinMenu.cs" />
     <Compile Include="Room.cs" />
+    <Compile Include="Save.cs" />
+    <Compile Include="SaveData.cs" />
     <Compile Include="Sprites\Bullet.cs" />
     <Compile Include="Sprites\Clippy.cs" />
     <Compile Include="Combat.cs" />
@@ -145,6 +151,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Sprite.cs" />
+    <Compile Include="DataStructs\Stack.cs" />
+    <Compile Include="DataStructs\UnderflowException.cs" />
     <Compile Include="Weapon.cs" />
     <Compile Include="Weapons\Gun.cs" />
     <Compile Include="Weapons\M16.cs" />
@@ -156,9 +164,10 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ApparitionContent\ApparitionContent.contentproj">
-      <Name>ApparitionContent</Name>
+    <ProjectReference Include="..\ApparitionContent\DesktopBattleContent.contentproj">
+      <Name>DesktopBattleContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
+      <Project>{DD05437D-6194-44DE-9252-8552B3B4C088}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -187,9 +196,6 @@
       <ProductName>Microsoft XNA Framework Redistributable 4.0</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Apparition_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Items\" />

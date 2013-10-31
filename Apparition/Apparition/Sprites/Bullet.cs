@@ -15,26 +15,39 @@ namespace DesktopBattle
     /// </summary>
     //This class inherits from Sprite instead of Gun because it shares
     //more things in common with Sprite.
-    class Bullet : Sprite
+    public class Bullet : Sprite
     {
         #region Class Variables
-        private int bulletSpeed = 900; //the base speed of the hero
+        private int bulletSpeed = 1100; //the base speed of the hero
         private float angle; //angle of trajectory
         private string bulletName = "pictures/bullet"; //name of the bullet picture
+        public int bulletDamage;
         #endregion
 
         /// <summary>
-        /// Creates a new bullet.
+        /// Gives the bullet info to spawn on screen.
         /// </summary>
         /// <param name="firingAngle">Angle of the gun</param>
         /// <param name="gunPosition">Position of the gun on-screen</param>
-        public Bullet(ContentManager theContentManager, GraphicsDeviceManager graphics,
-            float firingAngle, Vector2 gunPosition)
+        public void LoadContent(float firingAngle, Vector2 gunPosition, int damage)
         {
+            isAlive = true;
             angle = firingAngle;
             Position = gunPosition;
+            bulletDamage = damage;
             newlyCreated = false;
-            base.LoadContent(theContentManager, bulletName, graphics);
+            base.LoadContent(bulletName);
+        }
+
+        /// <summary>
+        /// Creates a basic bullet to be used later
+        /// </summary>
+        /// <param name="firingAngle">Angle of the gun</param>
+        /// <param name="gunPosition">Position of the gun on-screen</param>
+        public Bullet()
+        {
+            newlyCreated = false;
+            base.LoadContent(bulletName);
         }
 
         public override void Update(GameTime gameTime)
@@ -46,7 +59,6 @@ namespace DesktopBattle
                 Vector2 up = new Vector2(1, 0);
                 Matrix rotationMatrix = Matrix.CreateRotationZ(angle);
                 spriteDirection = Vector2.Transform(up, rotationMatrix);
-                //spriteDirection = spriteSpeed / 50.0f;
                 spriteAngle = angle;
                 base.Update(gameTime, spriteSpeed, spriteDirection);
             }
@@ -55,7 +67,5 @@ namespace DesktopBattle
                 isAlive = false;
             }
         }
-
-        
     }
 }
