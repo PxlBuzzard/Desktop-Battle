@@ -1,6 +1,7 @@
 # Desktop Battle
 
-![logo](https://github.com/PxlBuzzard/Desktop_Battle/blob/master/Apparition/ApparitionContent/pictures/menuheader.png)
+[logo]: https://raw.github.com/PxlBuzzard/Desktop_Battle/master/Apparition/ApparitionContent/pictures/menuheader.png
+![logo]
 
 ## Features
 * Clippy
