@@ -1,0 +1,6 @@
+-Moved open curly braces down to their own line
+-Commented all the methods (XML) and a few more code blocks, still need to comment classes
+-Began implementation of guns/items
+-Began implementing enemies as a list
+-Moved a few code blocks around, removed a lot of unnecessary code, optimized a couple high-performance spots (such as drawing the background texture once and not on every frame)
+
