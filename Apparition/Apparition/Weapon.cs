@@ -21,8 +21,11 @@ namespace DesktopBattle
     public abstract class Weapon
     {
         #region Class Variables
+        [System.Xml.Serialization.XmlIgnore]
         public string theWeaponName; //the name of the weapon file
+        [System.Xml.Serialization.XmlIgnore]
         public Rectangle Size; //the size of the weapon, set at creation of weapon
+        [System.Xml.Serialization.XmlIgnore]
         public Vector2 Position; //current position of the weapon
         protected float weaponAngle; //angle of the weapon to the mouse
         public int DamagePerAttack; //how much damage each bullet or melee swing does

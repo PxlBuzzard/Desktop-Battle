@@ -18,10 +18,13 @@ namespace DesktopBattle
         public Vector2 Position = new Vector2(0, 0); //current position
         protected Vector2 spriteDirection = Vector2.Zero; //initial direction of the enemy
         protected Vector2 spriteSpeed = Vector2.Zero; //initial speed of the enemy
-        protected float spriteAngle; //rotation of the sprite
+        protected float spriteAngle = 0.0f; //rotation of the sprite
+        [System.Xml.Serialization.XmlIgnore]
         public Texture2D mSpriteTexture; //the texture being used
+        [System.Xml.Serialization.XmlIgnore]
         public string spriteName; //name of the sprite
         static protected Random rnd = new Random();
+        [System.Xml.Serialization.XmlIgnore]
         public Rectangle Size //the size of the sprite
         {
             get
@@ -46,10 +49,13 @@ namespace DesktopBattle
         }
         private int hp; //the private hp variable
         public bool isAlive = true; //checks the "living" status of the object
+        [System.Xml.Serialization.XmlIgnore]
         public bool newlyCreated = true; //checks for recent creation
 
         //this is the max value an object is allowed to reach (its personal screen edge)
+        [System.Xml.Serialization.XmlIgnore]
         public int maxX { get { return MaxX; } set { MaxX = value; } }
+        [System.Xml.Serialization.XmlIgnore]
         public int maxY { get { return MaxY; } set { MaxY = value; } }
         private int MaxX;
         private int MaxY;
@@ -77,7 +83,7 @@ namespace DesktopBattle
         protected void GenerateStartingLocation()
         {
             Position.X = maxX - 30;
-            Position.Y = maxY - 100 - rnd.Next(500);
+            Position.Y = maxY - 100 - rnd.Next(450);
         }
 
         /// <summary>
@@ -112,26 +118,26 @@ namespace DesktopBattle
                 Position.X += theDirection.X * theSpeed.X * (float)theGameTime.ElapsedGameTime.TotalSeconds;
             }
             //this handles the sprite trying to move off the screen
-            else if (Position.X < 0) 
+            else if (Position.X <= 0) 
             {
-                Position.X += 1;
+                Position.X = 1;
             }
             else 
             {
-                Position.X -= 1;
+                Position.X = maxX - 1;
             }
 
             if (Position.Y < maxY && Position.Y > 0) 
             {
                 Position.Y += theDirection.Y * theSpeed.Y * (float)theGameTime.ElapsedGameTime.TotalSeconds;
             }
-            else if (Position.Y < 0) 
+            else if (Position.Y <= 0) 
             {
-                Position.Y += 1;
+                Position.Y = 1;
             }
             else 
             {
-                Position.Y -= 1;
+                Position.Y = maxY - 1;
             }
         }
 

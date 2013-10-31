@@ -14,7 +14,7 @@ namespace DesktopBattle
     /// <summary>
     /// Makes a pistol weapon.
     /// </summary>
-    [Serializable()]
+
     public class Pistol : Gun
     {
         /// <summary>

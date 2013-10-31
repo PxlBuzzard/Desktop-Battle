@@ -51,11 +51,31 @@ namespace DesktopBattle
                 newlyCreated = false;
             }
 
+            //helps keep the Clippy away from the edges of the screen
+            if (Position.X <= 25)
+            {
+                spriteDirection.X = moveRight;
+            }
+            else if (Position.X >= maxX - 25)
+            {
+                spriteDirection.X = moveLeft;
+            }
+            if (Position.Y <= 25)
+            {
+                spriteDirection.Y = moveDown;
+            }
+            else if (Position.Y >= maxY - 25)
+            {
+                spriteDirection.Y = moveUp;
+            }
+
+            //will change Clippy's direction 5% of the time
             int moveCheck = Sprite.rnd.Next(100);
             if (moveCheck > 95) 
             {
                 UpdateMovement();
             }
+
             base.Update(theGameTime, spriteSpeed, spriteDirection);
         }
 

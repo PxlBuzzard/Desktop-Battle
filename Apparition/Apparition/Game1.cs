@@ -104,6 +104,19 @@ namespace DesktopBattle
                 Exit();
             }
             #endregion
+            #region Save/Load Buttons
+            //save
+            if (keyboardState.IsKeyDown(Keys.F1))
+            {
+                cSave.GameSaveRequested = true;
+            }
+            //load
+            if (keyboardState.IsKeyDown(Keys.F2))
+            {
+                cSave.GameLoadRequested = true;
+            }
+            #endregion
+
             cSave.Update();
             switch (currentState)
             {
@@ -140,7 +153,7 @@ namespace DesktopBattle
                         Enemy.Draw();
                     }
                     cHero.Draw();
-                    cGameUI.Draw();
+                    cGameUI.Draw(gameTime);
                     break;
 
                 case Menu.GameState.MainMenu:

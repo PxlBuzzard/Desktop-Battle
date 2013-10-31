@@ -13,9 +13,11 @@ namespace DesktopBattle
     /// <summary>
     /// Makes a room that will be one of many inside a level.
     /// </summary>
+    [Serializable()]
     public class Room : Area
     {
         #region Class Variables
+        [System.Xml.Serialization.XmlIgnore]
         public Texture2D roomBackground; //the background texture
         public int totalEnemies; //number of enemies that will be in the room on first load.
         #endregion
@@ -29,6 +31,31 @@ namespace DesktopBattle
         {
             roomBackground = Game1.theContentManager.Load<Texture2D>(roomTexture);
             totalEnemies = numEnemies;
+        }
+
+        /// <summary>
+        /// Default Room constructor
+        /// </summary>
+        public Room()
+        {
+            //creates a black background
+            int maxX = Game1.cGameUI.maxX;
+            int maxY = Game1.cGameUI.maxY;
+            Color[] color = new Color[maxX * maxY];
+            for (int x = 0; x < maxX; x++)
+            {
+                for (int y = 0; y < maxY; y++)
+                {
+                    color[x + y * maxX] = Color.Black;
+                }
+            }
+            Texture2D blackTexture = new Texture2D(Game1.graphics.GraphicsDevice,
+                maxX, maxY, false, SurfaceFormat.Color);
+            blackTexture.SetData(color);
+            roomBackground = blackTexture;
+
+            //default number of enemies in a room
+            totalEnemies = 5;
         }
 
         /// <summary>

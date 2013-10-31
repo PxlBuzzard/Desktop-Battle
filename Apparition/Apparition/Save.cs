@@ -19,28 +19,29 @@ namespace DesktopBattle
     public class Save
     {
         #region Class Variables
-        private SaveData saveGameData;
+        private SaveHero saveHeroData;
+        private SaveRoom saveRoomData;
         public bool GameSaveRequested = false; //allows other classes to ask for a save
-        public bool GameLoadRequested = false; //allows other classes to ask for a load
-        private string exeDir = System.IO.Path.GetDirectoryName
-                    (System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
-        private string saveFileName = "\\savegame.xml";
-        private string fullFilePath
-        {
-            get //combines file path with file name
-            {
-                string temp = exeDir + saveFileName;
-                return temp.Replace("file:\\", "");
-            }
-        }
+        public bool GameLoadRequested = true; //allows other classes to ask for a load
+        private string saveFileHero = "hero.xml"; //the hero file name
+        private string saveFileRooms = "rooms.xml"; //the rooms file name
         #endregion
 
-        public Save()
+        /// <summary>
+        /// Updates the SaveData with the latest information
+        /// </summary>
+        private void GenerateSaveData()
         {
-            saveGameData = new SaveData() //prime SaveData for saving game info
+            saveHeroData = new SaveHero() //prime SaveHero for saving the Hero
             {
-                currentRoom = Game1.cArea.currentRoom,
                 theHero = Game1.cHero,
+            };
+
+            saveRoomData = new SaveRoom() //prime SaveRoom
+            {
+                currentRoomNumber = Game1.cArea.currentRoom,
+                roomTextureNames = Game1.cArea.roomTex,
+                theRooms = Game1.cArea.Rooms,
             };
         }
 
@@ -49,10 +50,20 @@ namespace DesktopBattle
         /// </summary>
         private void SaveGame()
         {
-            DeleteExisting(); //deletes old file if it exists
-            StreamWriter file = new StreamWriter(fullFilePath);
-            XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
-            serializer.Serialize(file, saveGameData);
+            //save hero data
+            DeleteExisting(saveFileHero); //deletes old file if it exists
+            GenerateSaveData();
+            StreamWriter file = new StreamWriter(saveFileHero);
+            XmlSerializer serializer = new XmlSerializer(typeof(SaveHero));
+            serializer.Serialize(file, saveHeroData);
+            file.Close();
+
+            //save area data
+            DeleteExisting(saveFileRooms); //deletes old file if it exists
+            GenerateSaveData();
+            file = new StreamWriter(saveFileRooms);
+            serializer = new XmlSerializer(typeof(SaveRoom));
+            serializer.Serialize(file, saveRoomData);
             file.Close();
         }
 
@@ -61,25 +72,68 @@ namespace DesktopBattle
         /// </summary>
         public void LoadGame()
         {
-            TextReader XMLReader = new StreamReader(fullFilePath);
-            XmlSerializer deserializer = new XmlSerializer(typeof(SaveData));
-            saveGameData = (SaveData)deserializer.Deserialize(XMLReader);
+            try
+            {
+                TextReader XMLReader = new StreamReader(saveFileHero);
+                try
+                {
+                    XmlSerializer deserializer = new XmlSerializer(typeof(SaveHero));
+                    saveHeroData = (SaveHero)deserializer.Deserialize(XMLReader);
 
-            //get the variables reassociated with the runtime data
-            Game1.cArea.currentRoom = saveGameData.currentRoom;
-            Game1.cHero = saveGameData.theHero;
-            Game1.cHero.LoadContent(Game1.cHero.spriteName);
-            XMLReader.Close();
+                    //get the variables reassociated with the runtime data
+                    Game1.cHero = saveHeroData.theHero;
+                    Game1.cHero.LoadContent(Game1.cHero.heroAssetName);
+                }
+                catch
+                {
+                    Game1.cGameUI.Draw("Could not load your hero file, using default values.");
+                }
+                XMLReader.Close();
+            }
+            catch
+            {
+                Game1.cGameUI.Draw("Could not find your hero save file.");
+            }
+
+            try
+            {
+                TextReader XMLReader = new StreamReader(saveFileRooms);
+                try
+                {
+                    XmlSerializer deserializer = new XmlSerializer(typeof(SaveRoom));
+                    saveRoomData = (SaveRoom)deserializer.Deserialize(XMLReader);
+
+                    //get the variables reassociated with the runtime data
+                    Game1.cArea.currentRoom =
+                        (int)MathHelper.Clamp(saveRoomData.currentRoomNumber, 0, Game1.cArea.Rooms.Count - 1);
+
+                    try { Game1.cArea.roomTex = saveRoomData.roomTextureNames; }
+                    catch { Game1.cGameUI.Draw("You have an invalid string in loaded room texture names."); }
+
+                    try { Game1.cArea.Rooms = saveRoomData.theRooms; }
+                    catch { Game1.cGameUI.Draw("You have an invalid room in your loaded room list."); }
+                    Game1.cArea.LoadContent();
+                }
+                catch
+                {
+                    Game1.cGameUI.Draw("Could not load your saved rooms, using default rooms.");
+                }
+                XMLReader.Close();
+            }
+            catch
+            {
+                Game1.cGameUI.Draw("Could not find your rooms save file.");
+            }
         }
 
         /// <summary>
         /// If a previous save file already exists, delete it
         /// </summary>
-        private void DeleteExisting()
+        private void DeleteExisting(string fileName)
         {
-            if (File.Exists(fullFilePath))
+            if (File.Exists(fileName))
             {
-                File.Delete(fullFilePath);
+                File.Delete(fileName);
             }
         }
 
@@ -90,11 +144,13 @@ namespace DesktopBattle
         {
             if (GameSaveRequested)
             {
+                Game1.cGameUI.Draw("Saving...");
                 SaveGame();
                 GameSaveRequested = false;
             }
             else if (GameLoadRequested)
             {
+                Game1.cGameUI.Draw("Loading...");
                 LoadGame();
                 GameLoadRequested = false;
             }

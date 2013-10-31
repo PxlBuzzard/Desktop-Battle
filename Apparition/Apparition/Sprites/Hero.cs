@@ -19,14 +19,15 @@ namespace DesktopBattle
     public class Hero : Sprite
     {
         #region Class Variables
-        private string heroAssetName = "pictures/maincharacter"; //name of the hero texture
-        private int startPositionX = 20; //start position X in the first room
-        private int startPositionY = 250; //start position Y in the first room
-        private int heroSpeed = 160; //the base speed of the hero
-        private int moveUp = -3; //the speed at which they move up
-        private int moveDown = 3; //the speed at which they move down
-        private int moveLeft = -3; //the speed at which they move left
-        private int moveRight = 3; //the speed at which they move right
+        [System.Xml.Serialization.XmlIgnore]
+        public string heroAssetName = "pictures/maincharacter"; //name of the hero texture
+        public int startPositionX = 20; //start position X in the first room
+        public int startPositionY = 250; //start position Y in the first room
+        public int heroSpeed = 160; //the base speed of the hero
+        public int moveUp = -3; //the speed at which they move up
+        public int moveDown = 3; //the speed at which they move down
+        public int moveLeft = -3; //the speed at which they move left
+        public int moveRight = 3; //the speed at which they move right
         private KeyboardState oldState; //last known keyboard state
         private MouseState oldMouse; //last known mouse state
         public Weapon[] weapons = new Weapon[2]; //array of weapons held by the Hero
@@ -54,7 +55,7 @@ namespace DesktopBattle
             get { return listBullets; }
             set { listBullets = value; }
         }
-        private static Stack<Bullet> stackBullets;
+        private static Stack<Bullet> stackBullets = new Stack<Bullet>();
         public static Stack<Bullet> sBullets //stack of all the offscreen bullets
         {
             get { return stackBullets; }
@@ -67,16 +68,24 @@ namespace DesktopBattle
         /// </summary>
         public override void LoadContent() 
         {
-            Position = new Vector2(startPositionX, startPositionY);
-            spriteAngle = 0.0f; //starting angle of the Hero
-            HP = 100;
+            if (HP == 0) HP = 100;
             sCurrentState = State.Moving;
             newlyCreated = false;
 
-            //this part will need to handle file I/O in the future
+            //if (weapons.ElementAt(0) is Weapon) 
             weapons[0] = new Pistol();
-            currentWeapon = 0;
-            sBullets = Weapon.GenerateBulletStack(50);
+            if (sBullets.empty()) sBullets = Weapon.GenerateBulletStack(50);
+
+            //sanity checks on all the Hero variables
+            moveDown = (int)MathHelper.Clamp(moveDown, 1, 10);
+            moveUp = (int)MathHelper.Clamp(moveUp, -10, -1);
+            moveLeft = (int)MathHelper.Clamp(moveLeft, -10, -1);
+            moveRight = (int)MathHelper.Clamp(moveRight, 1, 10);
+            startPositionX = (int)MathHelper.Clamp(startPositionX, 1, maxX);
+            startPositionY = (int)MathHelper.Clamp(startPositionY, 1, maxY);
+            HP = (int)MathHelper.Clamp(HP, 1, 10000);
+
+            Position = new Vector2(startPositionX, startPositionY);
 
             base.LoadContent(heroAssetName);
         }

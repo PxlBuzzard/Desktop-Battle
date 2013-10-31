@@ -17,9 +17,9 @@ namespace DesktopBattle
     {
         #region Class Variables
         static Random rnd = new Random();
-        private int timeToSpawn;
-        private int nextSpawn = 0;
-        public bool stopSpawn = false;
+        private int timeToSpawn; //timer for spawning enemies
+        private int nextSpawn = 0; //when to dequeue next enemies
+        public bool stopSpawn = false; //stop spawning enemies temporarily
         #endregion
 
         /// <summary>

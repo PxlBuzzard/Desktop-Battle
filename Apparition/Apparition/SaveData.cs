@@ -8,12 +8,23 @@ namespace DesktopBattle
 {
     /// <summary>
     /// Acts as the bridge between the saved XML data and the 
-    /// game variables that are going to be saved.
+    /// game variables that are going to be saved. This struct
+    /// saves the Hero.
     /// </summary>
     [Serializable()]
-    public struct SaveData
+    public struct SaveHero
     {
-        public int currentRoom;
         public Hero theHero;
+    }
+
+    /// <summary>
+    /// This struct saves the rooms.
+    /// </summary>
+    [Serializable()]
+    public struct SaveRoom
+    {
+        public int currentRoomNumber;
+        public List<string> roomTextureNames;
+        public List<Room> theRooms;
     }
 }
