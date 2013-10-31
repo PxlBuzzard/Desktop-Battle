@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace DesktopBattle
 {
+    /// <summary>
+    /// Handles all combat-related events ingame, such as damage checks.
+    /// </summary>
     class Combat 
     {
         #region Class Variables
@@ -29,69 +34,49 @@ namespace DesktopBattle
         }
 
         /// <summary>
-        /// Runs on every frame to handle collision detection.
+        /// Fills the list of enemies with new enemies.
         /// </summary>
-        public void Update() 
+        /// <param name="numEnemies">number of enemies to add</param>
+        public void CreateEnemies(int numEnemies) 
         {
-            // Check collision with player, if hit then lower HP and move away
-            foreach (Sprite Enemy in lEnemies)
+            for (int i = 1; i <= numEnemies; i++) 
             {
-                if (IntersectPixels(mHero.Size, mHero.TextureData,
-                                    Enemy.Size, Enemy.TextureData))
-                {
-                    mHero.HP -= 10;
-                    mHero.Position.X -= 20;
-                }
-
-                // Check bullet collision with enemies, if hit then lower HP
-                if (IntersectPixels(mHero.Size, mHero.TextureData,
-                                    Enemy.Size, Enemy.TextureData))
-                {
-                    Enemy.HP -= 10;
-                }
+                lEnemies.Add(new Clippy());
             }
         }
 
         /// <summary>
-        /// Determines if there is overlap of the non-transparent pixels
-        /// between two sprites.
+        /// Runs on every frame to handle collision detection.
         /// </summary>
-        /// <param name="rectangleA">Bounding rectangle of the first sprite</param>
-        /// <param name="dataA">Pixel data of the first sprite</param>
-        /// <param name="rectangleB">Bouding rectangle of the second sprite</param>
-        /// <param name="dataB">Pixel data of the second sprite</param>
-        /// <returns>True if non-transparent pixels overlap; false otherwise</returns>
-        static bool IntersectPixels(Rectangle rectangleA, Color[] dataA,
-                                    Rectangle rectangleB, Color[] dataB)
+        public void Update(GameTime gameTime) 
         {
-            // Find the bounds of the rectangle intersection
-            int top = Math.Max(rectangleA.Top, rectangleB.Top);
-            int bottom = Math.Min(rectangleA.Bottom, rectangleB.Bottom);
-            int left = Math.Max(rectangleA.Left, rectangleB.Left);
-            int right = Math.Min(rectangleA.Right, rectangleB.Right);
-
-            // Check every point within the intersection bounds
-            for (int y = top; y < bottom; y++)
+            // Check collision with player, if hit then lower HP and move away
+            foreach (Sprite Enemy in lEnemies)
             {
-                for (int x = left; x < right; x++)
+                foreach (Bullet Bullet in mHero.weapons[mHero.currentWeapon].lBullets)
                 {
-                    // Get the color of both pixels at this point
-                    Color colorA = dataA[(x - rectangleA.Left) +
-                                         (y - rectangleA.Top) * rectangleA.Width];
-                    Color colorB = dataB[(x - rectangleB.Left) +
-                                         (y - rectangleB.Top) * rectangleB.Width];
-
-                    // If both pixels are not completely transparent,
-                    if (colorA.A != 0 && colorB.A != 0)
+                    if ((Bullet.Size).Intersects(Enemy.Size))
                     {
-                        // then an intersection has been found
-                        return true;
+                        Enemy.HP -= 10; //CHANGE THIS AFTER MILESTONE 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        Bullet.isAlive = false;
                     }
+                }
+                if ((mHero.Size).Intersects(Enemy.Size))
+                {
+                    mHero.HP -= 10;
+                    mHero.Position.X -= 50;
                 }
             }
 
-            // No intersection found
-            return false;
+            //updates and removes bullets if necessary
+            for (int i = lEnemies.Count() - 1; i >= 0; i--)
+            {
+                lEnemies[i].Update(gameTime);
+                if (!lEnemies[i].isAlive)
+                {
+                    lEnemies.Remove(lEnemies[i]);
+                }
+            }
         }
     }
 }

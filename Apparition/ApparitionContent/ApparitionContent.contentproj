@@ -84,15 +84,22 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="pictures\roommom.JPG">
-      <Name>roommom</Name>
+    <Compile Include="pictures\pistol.png">
+      <Name>pistol</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="pictures\merrymom.png">
-      <Name>merrymom</Name>
+    <Compile Include="pictures\bullet.png">
+      <Name>bullet</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="pictures\M16.png">
+      <Name>M16</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

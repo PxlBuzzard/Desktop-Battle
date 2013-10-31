@@ -1,9 +1,17 @@
 //Daniel Jost
-//GSD2 Homework 2
+//GSD2 Milestone 2
 
-//I blew hours trying get to get Clippy to load in a list, and now an array...
-//I want to use a list in the next version, but I had to make sacrifices
+//Note to self: Make Rooms into a linked list for Milestone 3.
 
+//The structure for the menus is there, but I didn't have the time to get
+//them properly implemented.
+
+//The 4 compile warnings are because of the Melee class which has no child classes yet,
+//hence the null warnings
+
+//HUGE PROBLEM: All the Clippys share the same variables.
+
+#region Variable Prefix Key
 //variable prefix key:
 //c = class
 //m = method and/or general
@@ -11,7 +19,9 @@
 //i = integer
 //b = boolean
 //l = list
+#endregion
 
+#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +32,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+#endregion
 
 namespace DesktopBattle 
 {
@@ -31,26 +42,20 @@ namespace DesktopBattle
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteFont font;
-        Viewport viewport;
 
         //list of classes
         static Hero cHero;
-        Area cArea;
+        static Area cArea;
         static GameUI cGameUI;
         static Combat cCombat;
         static List<Sprite> lEnemies = new List<Sprite>();
-
-        //this enum stores the current state of the game
-        public enum State { MainMenu, InGame, GameOver }
-        public State sCurrentState;
         #endregion
 
         public Game1() 
         {
             graphics = new GraphicsDeviceManager(this);
-            IsMouseVisible = true;
+            IsMouseVisible = true; //shows the mouse ingame
             Content.RootDirectory = "Content";
-            viewport = new Viewport();
 
             //Initialize screen size to an ideal resolution for the Xbox 360
             this.graphics.PreferredBackBufferWidth = 1280;
@@ -63,7 +68,6 @@ namespace DesktopBattle
         protected override void Initialize() 
         {
             cHero = new Hero();
-            //mClippy1 = new Clippy();
             lEnemies = new List<Sprite>();
             cArea = new Area();
             cGameUI = new GameUI();
@@ -72,32 +76,49 @@ namespace DesktopBattle
             base.Initialize();
         }
 
+        /// <summary>
+        /// Runs once at startup to load objects into memory
+        /// </summary>
         protected override void LoadContent() 
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("fonts/SpriteFont1");
 
-            cHero.LoadContent(this.Content);
-            //mClippy1.LoadContent(this.Content); //make a list
+            cHero.LoadContent(this.Content, this.graphics);
             cCombat.LoadContent(cHero, lEnemies);
-            cHero.LoadOther(cCombat, viewport);
-            cArea.LoadContent(this.Content, this.spriteBatch, cHero, lEnemies);
+            cArea.LoadContent(this.Content, cCombat, cHero, lEnemies);
+            foreach (var Enemy in lEnemies)
+            {
+                Enemy.LoadContent(this.Content, this.graphics);
+            }
             cGameUI.LoadContent(cHero, cArea, this.graphics);
         }
 
+        /// <summary>
+        /// Runs once every frame to update the content on screen.
+        /// </summary>
         protected override void Update(GameTime gameTime) 
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                this.Exit();
-
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.Escape) ||
+                gamePadState.Buttons.Back == ButtonState.Pressed)
+            {
+                Exit();
+            }
             cArea.Update(gameTime);
             cHero.Update(gameTime);
-            //mClippy1.Update(gameTime); //make list
+            foreach (var Enemy in lEnemies)
+            {
+                if (Enemy.newlyCreated)
+                {
+                    Enemy.LoadContent(this.Content, this.graphics);
+                }
+                Enemy.Update(gameTime);
+            }
+            cCombat.Update(gameTime);
            
-            base.Update(gameTime);
+            base.Update(gameTime); //last line
         }
 
         /// <summary>
@@ -106,16 +127,16 @@ namespace DesktopBattle
         protected override void Draw(GameTime gameTime) 
         {
             this.spriteBatch.Begin(); //draws in z-index order
-            cHero.Draw(this.spriteBatch);
-            foreach (Sprite Enemy in lEnemies)
+            cArea.Draw(this.spriteBatch);
+            foreach (var Enemy in lEnemies)
             {
                 Enemy.Draw(this.spriteBatch);
             }
-            cCombat.Update();
-            cGameUI.Draw(this.spriteBatch, font);
+            cHero.Draw(this.spriteBatch);
+            cGameUI.Draw(this.spriteBatch, font, this.Content, this.graphics);
             this.spriteBatch.End();
 
-            base.Draw(gameTime);
+            base.Draw(gameTime); //last line
         }
     }
 }

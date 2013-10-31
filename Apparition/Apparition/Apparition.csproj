@@ -127,6 +127,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Area.cs" />
+    <Compile Include="Sprites\Hero_Move.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Menus\GameOver.cs" />
+    <Compile Include="Menus\HelpMenu.cs" />
+    <Compile Include="Menus\MainMenu.cs" />
+    <Compile Include="Menus\PauseMenu.cs" />
+    <Compile Include="Menus\WinMenu.cs" />
+    <Compile Include="Room.cs" />
+    <Compile Include="Sprites\Bullet.cs" />
     <Compile Include="Sprites\Clippy.cs" />
     <Compile Include="Combat.cs" />
     <Compile Include="GameUI.cs" />
@@ -137,6 +147,7 @@
     <Compile Include="Sprite.cs" />
     <Compile Include="Weapon.cs" />
     <Compile Include="Weapons\Gun.cs" />
+    <Compile Include="Weapons\M16.cs" />
     <Compile Include="Weapons\Melee.cs" />
     <Compile Include="Weapons\Pistol.cs" />
   </ItemGroup>
@@ -179,6 +190,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Apparition_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Items\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

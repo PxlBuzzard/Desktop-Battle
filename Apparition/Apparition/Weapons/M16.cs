@@ -14,15 +14,15 @@ namespace DesktopBattle
     /// <summary>
     /// Makes a pistol weapon.
     /// </summary>
-    class Pistol : Gun
+    class M16 : Gun
     {
         /// <summary>
-        /// Creates a pistol with basic parameters.
+        /// Creates an M16 with basic parameters.
         /// </summary>
-        public Pistol(ContentManager theContentManager, GraphicsDeviceManager graphics)
+        public M16(ContentManager theContentManager, GraphicsDeviceManager graphics)
         {
             mContentManager = theContentManager;
-            base.LoadContent("pictures/pistol");
+            base.LoadContent("pictures/M16");
             base.DamagePerBullet = 10;
             graphicsManager = graphics;
         }
@@ -32,7 +32,15 @@ namespace DesktopBattle
         /// </summary>
         public override void Shoot()
         {
+            Vector2 Position2;
+            Position2.X = Position.X;
+            Position2.Y = Position.Y - 40;
+            Vector2 Position3;
+            Position3.X = Position.X;
+            Position3.Y = Position.Y + 40;
             lBullets.Add(new Bullet(mContentManager, graphicsManager, gunAngle, Position));
+            lBullets.Add(new Bullet(mContentManager, graphicsManager, gunAngle, Position2));
+            lBullets.Add(new Bullet(mContentManager, graphicsManager, gunAngle, Position3));
         }
     }
 }

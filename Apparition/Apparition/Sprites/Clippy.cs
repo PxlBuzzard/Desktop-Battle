@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,41 +8,40 @@ using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace DesktopBattle
 {
+    /// <summary>
+    /// Clippy is a basic enemy with random movement and low hp.
+    /// </summary>
     class Clippy : Sprite 
     {
-        #region Class Constants
-        const string HERO_ASSETNAME = "pictures/Clippy";
-        //the following are movement speed constants
-        const int MOVE_UP = -1;
-        const int MOVE_DOWN = 1;
-        const int MOVE_LEFT = -1;
-        const int MOVE_RIGHT = 1;
-        const int CLIPPY_SPEED = 150;
-        #endregion
-
         #region Class Variables
+        private string enemyAssetName = "pictures/Clippy"; //name of the hero texture
+        private int enemySpeed = 150; //the base speed of the hero
+        private int moveUp = -1; //the speed at which they move up
+        private int moveDown = 1; //the speed at which they move down
+        private int moveLeft = -1; //the speed at which they move left
+        private int moveRight = 1; //the speed at which they move right
         Random rnd = new Random();
-
-        Vector2 mDirection = Vector2.Zero;
-        Vector2 mSpeed = Vector2.Zero;
-
-        int startPositionX; //spawn position X
-        int startPositionY; //spawn position Y
+        int startPositionX; //spawn position X, assigned at creation
+        int startPositionY; //spawn position Y, assigned at creation
         #endregion
 
         /// <summary>
         /// Runs once to generate a new Clippy.
         /// </summary>
-        public void LoadContent(ContentManager theContentManager) 
+        public override void LoadContent(ContentManager theContentManager, GraphicsDeviceManager graphics) 
         {
             GenerateStartingLocation();
             Position = new Vector2(startPositionX, startPositionY);
-            mCurrentState = State.Moving;
+            sCurrentState = State.Moving;
             HP = 20;
-            base.LoadContent(theContentManager, HERO_ASSETNAME);
+            spriteAngle = 0.0f;
+            newlyCreated = false;
+
+            base.LoadContent(theContentManager, enemyAssetName, graphics);
         }
 
         /// <summary>
@@ -54,47 +54,49 @@ namespace DesktopBattle
         }
 
         /// <summary>
-        /// Runs on every frame to handle movement of Clippy.
+        /// Runs on every frame to handle movement of Clippy. Only a 5% chance
+        /// of movement change on each frame draw.
         /// </summary>
-        public void Update(GameTime theGameTime) 
+        public override void Update(GameTime theGameTime) 
         {
             int moveCheck = rnd.Next(100);
-            if (moveCheck > 95) {
+            if (moveCheck > 95) 
+            {
                 UpdateMovement();
             }
-            base.Update(theGameTime, mSpeed, mDirection);
+            base.Update(theGameTime, spriteSpeed, spriteDirection);
         }
 
         /// <summary>
-        /// Randomly moves Clippy around.
+        /// Randomly moves Clippy in 1 of 4 directions.
         /// </summary>
         private void UpdateMovement() 
         {
-            if (mCurrentState == State.Moving && isAlive) 
+            if (sCurrentState == State.Moving && isAlive) 
             {
-                mSpeed = Vector2.Zero;
-                mDirection = Vector2.Zero;
+                spriteSpeed = Vector2.Zero;
+                spriteDirection = Vector2.Zero;
                 int randomMovement = rnd.Next(4);
 
                 if (randomMovement == 0) 
                 {
-                    mSpeed.X = CLIPPY_SPEED;
-                    mDirection.X = MOVE_LEFT;
+                    spriteSpeed.X = enemySpeed;
+                    spriteDirection.X = moveLeft;
                 }
                 else if (randomMovement == 1) 
                 {
-                    mSpeed.X = CLIPPY_SPEED;
-                    mDirection.X = MOVE_RIGHT;
+                    spriteSpeed.X = enemySpeed;
+                    spriteDirection.X = moveRight;
                 }
                 else if (randomMovement == 2) 
                 {
-                    mSpeed.Y = CLIPPY_SPEED;
-                    mDirection.Y = MOVE_UP;
+                    spriteSpeed.Y = enemySpeed;
+                    spriteDirection.Y = moveUp;
                 }
                 else if (randomMovement == 3) 
                 {
-                    mSpeed.Y = CLIPPY_SPEED;
-                    mDirection.Y = MOVE_DOWN;
+                    spriteSpeed.Y = enemySpeed;
+                    spriteDirection.Y = moveDown;
                 }
             }
         }
