@@ -18,7 +18,7 @@ namespace DesktopBattle
     public class Bullet : Sprite
     {
         #region Class Variables
-        private int bulletSpeed = 1100; //the base speed of the hero
+        private int bulletSpeed = 1300; //the base speed of the hero
         private float angle; //angle of trajectory
         private string bulletName = "pictures/bullet"; //name of the bullet picture
         public int bulletDamage;

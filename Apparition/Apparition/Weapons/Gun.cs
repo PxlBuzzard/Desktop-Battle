@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 #endregion
 
 namespace DesktopBattle
@@ -42,8 +43,7 @@ namespace DesktopBattle
             }
 
             //gets the angle of the gun to the mouse
-            MouseState curMouse = Mouse.GetState();
-            Vector2 mouseLoc = new Vector2(curMouse.X, curMouse.Y);
+            Vector2 mouseLoc = new Vector2(Game1.currentMouseState.X, Game1.currentMouseState.Y);
             Vector2 direction = -(heroPosition - mouseLoc);
             weaponAngle = (float)(Math.Atan2(direction.Y, direction.X)); 
         }
@@ -72,6 +72,7 @@ namespace DesktopBattle
 
             //creates a rectangular bounding box around the gun
             Size = new Rectangle(0, 0, (int)(mWeaponTexture.Width), (int)(mWeaponTexture.Height));
+            shootSound = Game1.theContentManager.Load<SoundEffect>("sounds/gunshot" + theWeaponName.Replace("pictures/", ""));
         }
 
         public override string ToString()

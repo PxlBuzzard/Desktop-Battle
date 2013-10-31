@@ -22,9 +22,9 @@ namespace DesktopBattle
         private SaveHero saveHeroData;
         private SaveRoom saveRoomData;
         public bool GameSaveRequested = false; //allows other classes to ask for a save
-        public bool GameLoadRequested = true; //allows other classes to ask for a load
-        private string saveFileHero = "hero.xml"; //the hero file name
-        private string saveFileRooms = "rooms.xml"; //the rooms file name
+        public bool GameLoadRequested = false; //allows other classes to ask for a load
+        public string saveFileHero = "hero.xml"; //the hero file name
+        public string saveFileRooms = "rooms.xml"; //the rooms file name
         #endregion
 
         /// <summary>
@@ -92,7 +92,8 @@ namespace DesktopBattle
             }
             catch
             {
-                Game1.cGameUI.Draw("Could not find your hero save file.");
+                if (Game1.currentState != Menu.GameState.ResetStats)
+                    Game1.cGameUI.Draw("Could not find your hero save file.");
             }
 
             try
@@ -116,25 +117,38 @@ namespace DesktopBattle
                 }
                 catch
                 {
-                    Game1.cGameUI.Draw("Could not load your saved rooms, using default rooms.");
+                    if (Game1.currentState != Menu.GameState.ResetStats)
+                        Game1.cGameUI.Draw("Could not load your saved rooms, using default rooms.");
                 }
                 XMLReader.Close();
             }
             catch
             {
-                Game1.cGameUI.Draw("Could not find your rooms save file.");
+                if (Game1.currentState != Menu.GameState.ResetStats)
+                {
+                    Game1.cGameUI.Draw("Could not find your rooms save file.");
+                    throw new FileNotFoundException("Could not find your rooms save file.");
+                }
             }
         }
 
         /// <summary>
         /// If a previous save file already exists, delete it
         /// </summary>
-        private void DeleteExisting(string fileName)
+        public void DeleteExisting(string fileName)
         {
             if (File.Exists(fileName))
             {
                 File.Delete(fileName);
             }
+        }
+
+        /// <summary>
+        /// Simple check to see if the player has saved the game before.
+        /// </summary>
+        public bool DoesSaveFileExist()
+        {
+            return File.Exists("hero.xml") && File.Exists("rooms.xml");
         }
 
         /// <summary>
@@ -150,7 +164,8 @@ namespace DesktopBattle
             }
             else if (GameLoadRequested)
             {
-                Game1.cGameUI.Draw("Loading...");
+                if (Game1.currentState != Menu.GameState.MainMenu)
+                    Game1.cGameUI.Draw("Loading...");
                 LoadGame();
                 GameLoadRequested = false;
             }

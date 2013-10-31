@@ -1,1 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8" ?> 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SaveRoom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <currentRoomNumber>0</currentRoomNumber>
+  <roomTextureNames>
+    <string>pictures/room1</string>
+    <string>pictures/room2</string>
+    <string>pictures/room3</string>
+  </roomTextureNames>
+  <theRooms>
+    <Room>
+      <Rooms />
+      <totalEnemies>15</totalEnemies>
+    </Room>
+    <Room>
+      <Rooms />
+      <totalEnemies>16</totalEnemies>
+    </Room>
+    <Room>
+      <Rooms />
+      <totalEnemies>17</totalEnemies>
+    </Room>
+  </theRooms>
+</SaveRoom>

@@ -127,11 +127,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Area.cs" />
+    <Compile Include="DataStructs\FileNotFoundException.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="DataStructs\List.cs" />
     <Compile Include="DataStructs\Node.cs" />
     <Compile Include="DataStructs\OverflowException.cs" />
     <Compile Include="DataStructs\Queue.cs" />
+    <Compile Include="Menus\Button.cs" />
     <Compile Include="Sprites\Key.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Menus\GameOver.cs" />
@@ -158,6 +160,7 @@
     <Compile Include="Weapons\M16.cs" />
     <Compile Include="Weapons\Melee.cs" />
     <Compile Include="Weapons\Pistol.cs" />
+    <Compile Include="Weapons\Shotgun.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

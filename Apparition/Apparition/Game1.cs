@@ -36,7 +36,12 @@ namespace DesktopBattle
         static public ContentManager theContentManager;
         static public SpriteBatch spriteBatch;
         static public SpriteFont font;
-        public Menu.GameState currentState; //keeps track of the current game state
+        static public Menu.GameState currentState; //keeps track of the current game state
+        static public bool isMouseVisible;
+        static public KeyboardState currentKeyboardState;
+        static public MouseState currentMouseState;
+        static public KeyboardState lastKeyboardState;
+        static public MouseState lastMouseState;
 
         //list of classes
         static public Hero cHero;
@@ -46,19 +51,19 @@ namespace DesktopBattle
         static public List<Sprite> lEnemies = new List<Sprite>();
         static public Queue<Sprite> qEnemies = new Queue<Sprite>();
         static public Save cSave;
+        static public Menu cMenu;
         #endregion
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             theContentManager = Content;
-            this.Components.Add(new GamerServicesComponent(this));
             IsMouseVisible = false; //shows the mouse ingame
             Content.RootDirectory = "Content";
 
             //Initialize screen size to an ideal resolution for the Xbox 360
-            Game1.graphics.PreferredBackBufferWidth = 1280;
-            Game1.graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
         }
 
         /// <summary>
@@ -71,8 +76,9 @@ namespace DesktopBattle
             cArea = new Area();
             cGameUI = new GameUI();
             cCombat = new Combat();
-            currentState = Menu.GameState.Playing;
             cSave = new Save();
+            cMenu = new Menu();
+            currentState = Menu.GameState.MainMenu;
 
             base.Initialize(); //last line
         }
@@ -88,6 +94,14 @@ namespace DesktopBattle
             cHero.LoadContent();
             cArea.LoadContent();
             cGameUI.LoadContent();
+            cMenu.LoadContent();
+            cCombat.LoadContent();
+
+            //loads the game save if a save file exists
+            if (cSave.DoesSaveFileExist())
+            {
+                cSave.GameLoadRequested = true;
+            }
         }
 
         /// <summary>
@@ -95,46 +109,67 @@ namespace DesktopBattle
         /// </summary>
         protected override void Update(GameTime gameTime)
         {
-            #region Exit Code
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-            KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Escape) ||
-                gamePadState.Buttons.Back == ButtonState.Pressed)
+            if (IsActive)
             {
-                Exit();
-            }
-            #endregion
-            #region Save/Load Buttons
-            //save
-            if (keyboardState.IsKeyDown(Keys.F1))
-            {
-                cSave.GameSaveRequested = true;
-            }
-            //load
-            if (keyboardState.IsKeyDown(Keys.F2))
-            {
-                cSave.GameLoadRequested = true;
-            }
-            #endregion
+                currentMouseState = Mouse.GetState();
+                currentKeyboardState = Keyboard.GetState();
 
-            cSave.Update();
-            switch (currentState)
-            {
-                case Menu.GameState.Playing:
-                    cArea.Update(gameTime);
-                    cHero.Update(gameTime);
-                    foreach (Sprite Enemy in lEnemies)
-                    {
-                        Enemy.Update(gameTime);
-                    }
-                    cCombat.Update(gameTime);
-                    break;
+                cSave.Update();
+                switch (currentState)
+                {
+                    case Menu.GameState.Playing:
+                        //see if escape key is pressed
+                        if (currentKeyboardState.IsKeyDown(Keys.Escape) &&
+                            !lastKeyboardState.IsKeyDown(Keys.Escape))
+                        {
+                            currentState = Menu.GameState.PauseMenu;
+                        }
+                        //see if game window is visible
+                        if (!IsActive)
+                        {
+                            currentState = Menu.GameState.PauseMenu;
+                        }
+                        cArea.Update(gameTime);
+                        cHero.Update(gameTime);
+                        cCombat.Update(gameTime);
+                        foreach (Sprite Enemy in lEnemies)
+                        {
+                            Enemy.Update(gameTime);
+                        }
+                        break;
+                    case Menu.GameState.MainMenu:
+                        cMenu.mainMenu.Update(gameTime);
+                        break;
+                    case Menu.GameState.HelpMenu:
+                        cMenu.helpMenu.Update(gameTime);
+                        break;
+                    case Menu.GameState.PauseMenu:
+                        cMenu.pauseMenu.Update(gameTime);
+                        break;
+                    case Menu.GameState.WinMenu:
+                        cMenu.winMenu.Update(gameTime);
+                        break;
+                    case Menu.GameState.GameOver:
+                        cMenu.gameOverMenu.Update(gameTime);
+                        break;
+                    case Menu.GameState.ResetStats:
+                        cSave.DeleteExisting(cSave.saveFileHero);
+                        cSave.DeleteExisting(cSave.saveFileRooms);
+                        cHero.totalEnemiesKilled = 0;
+                        cHero.Position.X = cHero.startPositionX;
+                        cHero.Position.Y = cHero.startPositionY;
+                        cArea.currentRoom = 0;
+                        currentState = Menu.GameState.Playing;
+                        break;
+                    case Menu.GameState.Exit:
+                        Exit();
+                        break;
+                }
 
-                case Menu.GameState.MainMenu:
-                    //MENU UPDATE CODE
-                    break;
+                lastKeyboardState = currentKeyboardState;
+                lastMouseState = currentMouseState;
+                base.Update(gameTime); //last line
             }
-            base.Update(gameTime); //last line
         }
 
         /// <summary>
@@ -143,28 +178,22 @@ namespace DesktopBattle
         protected override void Draw(GameTime gameTime) 
         {
             GraphicsDevice.Clear(Color.Black);
-            Game1.spriteBatch.Begin(); //draws in z-index order
-            switch (currentState) 
+            spriteBatch.Begin(); //draws in z-index order
+
+            //show mouse or crosshair cursor
+            if (!isMouseVisible)
+                IsMouseVisible = false;
+            else IsMouseVisible = true;
+
+            cArea.Draw();
+            foreach (Sprite Enemy in lEnemies)
             {
-                case Menu.GameState.Playing:
-                    cArea.Draw();
-                    foreach (Sprite Enemy in lEnemies)
-                    {
-                        Enemy.Draw();
-                    }
-                    cHero.Draw();
-                    cGameUI.Draw(gameTime);
-                    break;
-
-                case Menu.GameState.MainMenu:
-                    //MENU DRAW CODE
-                    break;
-
-                case Menu.GameState.PauseMenu:
-                    //PAUSE MENU DRAW CODE
-                    break;
+                Enemy.Draw();
             }
-            Game1.spriteBatch.End();
+            cHero.Draw();
+            cGameUI.Draw(gameTime);
+            cMenu.DrawCurrentMenu();
+            spriteBatch.End();
 
             base.Draw(gameTime); //last line
         }

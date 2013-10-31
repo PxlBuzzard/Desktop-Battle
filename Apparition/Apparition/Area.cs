@@ -51,7 +51,7 @@ namespace DesktopBattle
             //builds the Rooms list based on texture count
             for (int i = 0; i <= roomTex.Count - 1; i++)
             {
-                Rooms.Add(new Room(roomTex[i], (i + 5)));
+                Rooms.Add(new Room(roomTex[i], (i + 15)));
                 //sanity check on number of enemies spawning in room
                 Rooms[i].totalEnemies = (int)MathHelper.Clamp(Rooms[i].totalEnemies, 1, 100);
             }
@@ -128,11 +128,12 @@ namespace DesktopBattle
                 Game1.cCombat.stopSpawn = true;
             }
 
-            //check to see if player is in the last room
-            if (areaClear && currentRoom == Rooms.Count - 1)
+            //checks for completion of the last room
+            if (areaClear && currentRoom == Rooms.Count - 1
+                && Game1.currentState != Menu.GameState.WinMenu)
             {
-                //ADD FINISH LEVEL CODE
-                //Game1.currentState = Menu.MenuState.WinMenu;
+                Game1.currentState = Menu.GameState.WinMenu;
+                Game1.cSave.GameSaveRequested = true;
             }
 
             //will load the next room if applicable

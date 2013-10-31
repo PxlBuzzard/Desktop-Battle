@@ -26,13 +26,17 @@ namespace DesktopBattle
         private string[] customStrings = new string[5]; //list of strings to draw
         #endregion
 
+        public GameUI()
+        {
+            maxX = Game1.graphics.PreferredBackBufferWidth;
+            maxY = Game1.graphics.PreferredBackBufferHeight;
+        }
+
         /// <summary>
         /// Runs once at startup to load information into the class.
         /// </summary>
         public void LoadContent() 
         {
-            maxX = Game1.graphics.PreferredBackBufferWidth;
-            maxY = Game1.graphics.PreferredBackBufferHeight;
             cursorTex = Game1.theContentManager.Load<Texture2D>("pictures/crosshair");
 
             //fill the custom string array
@@ -48,9 +52,20 @@ namespace DesktopBattle
         /// </summary>
         public void Draw(GameTime gameTime) 
         {
-            cursorPos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-            Game1.spriteBatch.Draw(cursorTex, cursorPos, Color.White);
-            Game1.spriteBatch.DrawString(Game1.font, "HP: " + Game1.cHero.HP, new Vector2(20, maxY - 50), Color.White);
+            //shows either the mouse or the crosshair
+            if (Game1.currentState == Menu.GameState.Playing)
+            {
+                Game1.isMouseVisible = false;
+                cursorPos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                Game1.spriteBatch.Draw(cursorTex, cursorPos, Color.White);
+            }
+            else 
+            { 
+                Game1.isMouseVisible = true; 
+            }
+            
+            Game1.spriteBatch.DrawString(Game1.font, "HP: " + Game1.cHero.HP, new Vector2(70, maxY - 50), Color.White);
+            Game1.spriteBatch.DrawString(Game1.font, "Total Kills: " + Game1.cHero.totalEnemiesKilled, new Vector2((maxX / 2 - 100), maxY - 50), Color.White);
             Game1.spriteBatch.DrawString(Game1.font, "Enemies left to kill: " +
                 (Game1.cArea.Rooms[Game1.cArea.currentRoom].totalEnemies - Game1.cArea.killsInRoom), new Vector2(maxX - 350, maxY - 50), Color.White);
             
@@ -73,31 +88,8 @@ namespace DesktopBattle
                 }
             }
 
-            //checks for hero death
-            if (Game1.cHero.HP <= 0)
-            {
-                Game1.spriteBatch.DrawString(Game1.font, "Game Over! Press ESCAPE to exit.", new Vector2(maxX / 2 - 140, maxY / 2), Color.White);
-                Game1.cCombat.stopSpawn = true;
-            }
-
-            //gives the Hero an M16 at the end of room 2
-            if (Game1.cArea.currentRoom == 1 && Game1.cArea.areaClear)
-            {
-                if (Game1.cHero.weapons[1] == null)
-                {
-                    Game1.cHero.weapons[1] = new M16();
-                }
-                Game1.spriteBatch.DrawString(Game1.font, "You unlocked the M16! Press Q to cycle weapons.", new Vector2(maxX / 2 - 220, maxY / 2), Color.White);
-            }
-
-            //shows a special message at the end of the game
-            else if (Game1.cArea.Rooms.Count - 1 == Game1.cArea.currentRoom && Game1.cArea.areaClear)  //MAKE THIS LOAD A MENU SCREEN LATER, OPPOSITE OF GAME OVER
-            {
-                Game1.spriteBatch.DrawString(Game1.font, "Press ESCAPE to exit. Thanks for playing!", new Vector2(maxX / 2 - 180, maxY / 2), Color.White);
-            }
-
             //shows text if the room is cleared
-            else if (Game1.cArea.areaClear) 
+            if (Game1.cArea.areaClear) 
             {
                 Game1.spriteBatch.DrawString(Game1.font, "Room Clear, continue on to next room ---->", new Vector2(maxX / 2 - 170, maxY / 2), Color.White);
             }

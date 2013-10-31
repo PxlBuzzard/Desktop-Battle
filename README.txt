@@ -4,28 +4,35 @@ Created by Daniel Jost
 How to Play:
 WASD or Arrow Keys to move
 Move mouse and click to shoot
+Escape to pause
 Q to switch weapons
-F1 to Save
-F2 to Load
 
 #region NOTES FOR LEIGH:
-Milestone 4 Requirements
-- Moved Hero and Room values into external files
--- hero.xml and rooms.xml are in the Debug folder (output directory)
-
-As I note above, use F1 to save and F2 to load. I've tried to speed up the process
-for you by running a Load when the game starts, and it will also do a Save when
-you move to a new room.
+Final Submission Requirements
+- Custom event (n/a)
+- custom FileNotFoundException (Save.cs line 126)
+- My XNA menus are pretty much awesome (Menu.cs, and in the Menus folder)
+- world to move in (yes)
+- items to interact with (guns)
+- characters to interact with (enemies)
 
 Bonus Points
-- Used XML for majority of file I/O
-- Already got serialization bonus points in Milestone 3
+- Used XNA
+- have sound in the game (pistol.cs line 34, M16.cs line 34,
+    Shotgun.cs line 34 Combat.cs line 94)
+
+Special Note: Try using the shotgun, it's so much fun. The quick way to get it is to bump
+your total kill count up to 99, it'll unlock at 100.
 #endregion
 
 Changelog
 Added:
-- Can draw up to 5 custom strings in the middle of the screen
-- Enhanced file saving/loading to allow for basic modding
+- Menus! Main menu, pause menu, game over, etc
+- New weapon: Shotgun
+-- Shoots 5 bullets at a time, unlocked after 100 kills
+- Sounds for gunfire and when enemies are shot
+- Track number of enemies killed
+- Loads save file on startup if you've played before
 
 Changed:
-- Rooms are now loaded into a list instead of a fixed array
+- Diagonal speed is capped to match the speed of uni-directional movement.

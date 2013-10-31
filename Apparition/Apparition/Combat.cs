@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 #endregion
 
 namespace DesktopBattle
@@ -20,6 +21,7 @@ namespace DesktopBattle
         private int timeToSpawn; //timer for spawning enemies
         private int nextSpawn = 0; //when to dequeue next enemies
         public bool stopSpawn = false; //stop spawning enemies temporarily
+        private SoundEffect hitSound;
         #endregion
 
         /// <summary>
@@ -41,6 +43,11 @@ namespace DesktopBattle
             {
                 Game1.qEnemies.enqueue(new Clippy());
             }
+        }
+
+        public void LoadContent()
+        {
+            hitSound = Game1.theContentManager.Load<SoundEffect>("sounds/hit");
         }
 
         /// <summary>
@@ -76,7 +83,7 @@ namespace DesktopBattle
                     //bullet collides with enemy
                     if ((Bullet.Size).Intersects(Enemy.Size))
                     {
-                        //Console.Beep();
+                        hitSound.Play();
                         Enemy.HP -= Bullet.bulletDamage;
                         Bullet.isAlive = false;
                     }
@@ -84,12 +91,29 @@ namespace DesktopBattle
                 // Check collision with player, if hit then lower HP and move away
                 if ((Game1.cHero.Size).Intersects(Enemy.Size))
                 {
+                    hitSound.Play();
                     Game1.cHero.HP -= 10;
-                    Game1.cHero.Position.X -= 50; //this is bad knockback code
+                    if (Game1.cHero.Position.X > Enemy.Position.X)
+                    {
+                        Game1.cHero.Position.X += 75;
+                    }
+                    else
+                    {
+                        Game1.cHero.Position.X -= 75;
+                    }
                 }
             }
 
-            //removes enemies if necessary
+            //checks for hero death and shows game over screen
+            if (Game1.cHero.HP <= 0 && Game1.currentState != Menu.GameState.GameOver)
+            {
+                Game1.currentState = Menu.GameState.GameOver;
+                stopSpawn = true;
+            }
+
+            //Removes enemies if necessary.
+            //Uses a for loop instead of foreach because the count
+            //can change during the loop.
             for (int i = Game1.lEnemies.Count() - 1; i >= 0; i--)
             {
                 if (!Game1.lEnemies[i].isAlive)
@@ -99,6 +123,7 @@ namespace DesktopBattle
                     Game1.qEnemies.enqueue(Game1.lEnemies[i]);
                     Game1.lEnemies.Remove(Game1.lEnemies[i]);
                     Game1.cArea.killsInRoom++;
+                    Game1.cHero.totalEnemiesKilled++;
                 }
             }
         }

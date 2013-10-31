@@ -16,8 +16,8 @@ namespace DesktopBattle
     {
         #region Class Variables
         public Vector2 Position = new Vector2(0, 0); //current position
-        protected Vector2 spriteDirection = Vector2.Zero; //initial direction of the enemy
-        protected Vector2 spriteSpeed = Vector2.Zero; //initial speed of the enemy
+        public Vector2 spriteDirection = Vector2.Zero; //initial direction of the enemy
+        public Vector2 spriteSpeed = Vector2.Zero; //initial speed of the enemy
         protected float spriteAngle = 0.0f; //rotation of the sprite
         [System.Xml.Serialization.XmlIgnore]
         public Texture2D mSpriteTexture; //the texture being used
@@ -113,6 +113,10 @@ namespace DesktopBattle
         /// </summary>
         public void Update(GameTime theGameTime, Vector2 theSpeed, Vector2 theDirection) 
         {
+            //caps diagonal speed
+            if (theDirection != Vector2.Zero)
+                theDirection.Normalize();
+
             if (Position.X < maxX && Position.X > 0) 
             {
                 Position.X += theDirection.X * theSpeed.X * (float)theGameTime.ElapsedGameTime.TotalSeconds;

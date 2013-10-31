@@ -1,1 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8" ?> 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SaveHero xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <theHero>
+    <Position>
+      <X>20</X>
+      <Y>250</Y>
+    </Position>
+    <spriteDirection>
+      <X>0</X>
+      <Y>0</Y>
+    </spriteDirection>
+    <spriteSpeed>
+      <X>0</X>
+      <Y>0</Y>
+    </spriteSpeed>
+    <isAlive>true</isAlive>
+    <HP>100</HP>
+    <startPositionX>20</startPositionX>
+    <startPositionY>250</startPositionY>
+    <heroSpeed>500</heroSpeed>
+    <moveUp>-3</moveUp>
+    <moveDown>3</moveDown>
+    <moveLeft>-3</moveLeft>
+    <moveRight>3</moveRight>
+    <weapons>
+      <Weapon xsi:type="Pistol">
+        <DamagePerAttack>10</DamagePerAttack>
+      </Weapon>
+      <Weapon xsi:nil="true" />
+    </weapons>
+    <currentWeapon>0</currentWeapon>
+    <isFlipped>false</isFlipped>
+  </theHero>
+</SaveHero>

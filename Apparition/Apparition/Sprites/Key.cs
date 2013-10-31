@@ -19,7 +19,7 @@ namespace DesktopBattle
     {
         #region Class Variables
         private string enemyAssetName = "pictures/key"; //name of the sprite texture
-        private int enemySpeed = 200; //the base speed of the enemy
+        private int enemySpeed = 300; //the base speed of the enemy
         private int moveUp = -1; //the speed at which they move up
         private int moveDown = 1; //the speed at which they move down
         private int moveLeft = -1; //the speed at which they move left

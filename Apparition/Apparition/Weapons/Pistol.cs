@@ -31,6 +31,7 @@ namespace DesktopBattle
         /// </summary>
         public override void Shoot()
         {
+            shootSound.Play();
             Bullet b = Hero.sBullets.peek();
             Hero.sBullets.Pop();
             b.LoadContent(base.weaponAngle, base.Position, DamagePerAttack);

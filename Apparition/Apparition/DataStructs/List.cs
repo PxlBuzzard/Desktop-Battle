@@ -44,7 +44,14 @@ namespace DesktopBattle
                     throw new IndexOutOfRangeException("index is not in List");
                 }
 
-                return temp.Data;
+                try
+                {
+                    return temp.Data;
+                }
+                catch
+                {
+                    return default(T);
+                }
             }
 
             set

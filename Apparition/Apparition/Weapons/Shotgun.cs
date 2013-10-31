@@ -15,14 +15,14 @@ namespace DesktopBattle
     /// Makes a pistol weapon.
     /// </summary>
     [Serializable()]
-    public class M16 : Gun
+    public class Shotgun : Gun
     {
         /// <summary>
         /// Creates an M16 with basic parameters.
         /// </summary>
-        public M16()
+        public Shotgun()
         {
-            base.LoadContent("pictures/M16");
+            base.LoadContent("pictures/shotgun");
             base.DamagePerAttack = 10;
         }
 
@@ -40,21 +40,37 @@ namespace DesktopBattle
             //bullet 2
             Vector2 Position2;
             Position2.X = Position.X;
-            Position2.Y = Position.Y - 50;
+            Position2.Y = Position.Y - 30;
             Bullet b2 = Hero.sBullets.peek();
             Hero.sBullets.Pop();
-            b2.LoadContent(weaponAngle + 0.3f, Position2, DamagePerAttack);
+            b2.LoadContent(weaponAngle + 0.15f, Position2, DamagePerAttack);
             //bullet 3
             Vector2 Position3;
             Position3.X = Position.X;
-            Position3.Y = Position.Y + 30;
+            Position3.Y = Position.Y + 10;
             Bullet b3 = Hero.sBullets.peek();
             Hero.sBullets.Pop();
-            b3.LoadContent(weaponAngle - 0.3f, Position3, DamagePerAttack);
+            b3.LoadContent(weaponAngle - 0.15f, Position3, DamagePerAttack);
+            //bullet 4
+            Vector2 Position4;
+            Position4.X = Position.X;
+            Position4.Y = Position.Y - 50;
+            Bullet b4 = Hero.sBullets.peek();
+            Hero.sBullets.Pop();
+            b4.LoadContent(weaponAngle + 0.3f, Position2, DamagePerAttack);
+            //bullet 5
+            Vector2 Position5;
+            Position5.X = Position.X;
+            Position5.Y = Position.Y + 30;
+            Bullet b5 = Hero.sBullets.peek();
+            Hero.sBullets.Pop();
+            b5.LoadContent(weaponAngle - 0.3f, Position3, DamagePerAttack);
 
             Hero.lBullets.Add(b1);
             Hero.lBullets.Add(b2);
             Hero.lBullets.Add(b3);
+            Hero.lBullets.Add(b4);
+            Hero.lBullets.Add(b5);
         }
     }
 }
